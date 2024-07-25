@@ -37,10 +37,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-//читання статей
+//С‡РёС‚Р°РЅРЅСЏ СЃС‚Р°С‚РµР№
 app.MapGet(pattern: "/articles", async(ArticlesContext context) => await context.Articles.ToListAsync());
 
-//додавання статті
+//РґРѕРґР°РІР°РЅРЅСЏ СЃС‚Р°С‚С‚С–
 app.MapPost(pattern: "articles", async (Article article, ArticlesContext context) =>
 {
     context.Articles.Add(article); ;
@@ -49,7 +49,7 @@ app.MapPost(pattern: "articles", async (Article article, ArticlesContext context
 }
 );
 
-//пошук за назвою
+//РїРѕС€СѓРє Р·Р° РЅР°Р·РІРѕСЋ
 app.MapGet(pattern: "/articles/title/{Title}", async (string Title, ArticlesContext context) =>
 {
     var articles = await context.Articles.Where(a => a.Title == Title).ToListAsync();
@@ -61,7 +61,7 @@ app.MapGet(pattern: "/articles/title/{Title}", async (string Title, ArticlesCont
     return Results.Ok(articles);
 });
 
-//пошук за категорією
+//РїРѕС€СѓРє Р·Р° РєР°С‚РµРіРѕСЂС–С”СЋ
 app.MapGet(pattern: "/articles/category/{Category}", async (string Category, ArticlesContext context) =>
 {
     var articles = await context.Articles.Where(a => a.Category == Category).ToListAsync();
@@ -73,7 +73,7 @@ app.MapGet(pattern: "/articles/category/{Category}", async (string Category, Art
     return Results.Ok(articles);
 });
 
-//пошук за описом
+//РїРѕС€СѓРє Р·Р° РѕРїРёСЃРѕРј
 app.MapGet(pattern: "/articles/description/{Description}", async (string Description, ArticlesContext context) =>
 {
     var articles = await context.Articles.Where(a => a.Description == Description).ToListAsync();
@@ -83,6 +83,18 @@ app.MapGet(pattern: "/articles/description/{Description}", async (string Descrip
     }
 
     return Results.Ok(articles);
+});
+
+//РїРѕС€СѓРє Р·Р° ID
+app.MapGet("/articles/{id:int}", async (int id, ArticlesContext context) =>
+{
+    var article = await context.Articles.FindAsync(id);
+    if (article == null)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.Ok(article);
 });
 
 app.MapDelete(pattern: "/articles/{id:int}", async (int id, ArticlesContext context) =>
@@ -99,7 +111,7 @@ app.MapDelete(pattern: "/articles/{id:int}", async (int id, ArticlesContext cont
     return Results.NoContent();
 });
 
-// редагування статті
+// СЂРµРґР°РіСѓРІР°РЅРЅСЏ СЃС‚Р°С‚С‚С–
 app.MapPut("/articles/{id:int}", async (int id, Article updatedArticle, ArticlesContext context) =>
 {
     if (id != updatedArticle.Id)
@@ -113,7 +125,7 @@ app.MapPut("/articles/{id:int}", async (int id, Article updatedArticle, Articles
         return Results.NotFound();
     }
 
-    // Оновлення полів статті
+    // РћРЅРѕРІР»РµРЅРЅСЏ РїРѕР»С–РІ СЃС‚Р°С‚С‚С–
     article.Title = updatedArticle.Title;
     article.Author = updatedArticle.Author;
     article.Category = updatedArticle.Category;
@@ -141,7 +153,7 @@ app.MapPut("/articles/{id:int}", async (int id, Article updatedArticle, Articles
 });
 
 
-app.UseAuthorization();
+//app.UseAuthorization();
 
 app.MapControllers();
 
