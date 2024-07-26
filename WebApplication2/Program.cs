@@ -3,21 +3,28 @@ using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using WebApplication2.Models;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.AspNetCore.Identity;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 builder.Services.AddDbContext<ArticlesContext>
     (options => options.UseNpgsql(builder.Configuration.GetConnectionString("ArticlesContext")).UseLowerCaseNamingConvention());
-    
-   var app = builder.Build();
+
+// Додайте Identity
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<ArticlesContext>()
+    .AddDefaultTokenProviders();
+
+var app = builder.Build();
 using (var scope=app.Services.CreateScope())
 {
     var services= scope.ServiceProvider;
@@ -37,19 +44,64 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-//С‡РёС‚Р°РЅРЅСЏ СЃС‚Р°С‚РµР№
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+//app.MapRazorPages();
+
+//// Реєстрація
+//app.MapPost("/register", async (RegisterViewModel model, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager) =>
+//{
+//    if (!string.IsNullOrEmpty(model.Email) && !string.IsNullOrEmpty(model.Password) && model.Password == model.ConfirmPassword)
+//    {
+//        var user = new IdentityUser { UserName = model.Email, Email = model.Email };
+//        var result = await userManager.CreateAsync(user, model.Password);
+//        if (result.Succeeded)
+//        {
+//            await signInManager.SignInAsync(user, isPersistent: false);
+//            return Results.Ok();
+//        }
+//        return Results.BadRequest(result.Errors);
+//    }
+//    return Results.BadRequest("Invalid registration details");
+//});
+
+// Вхід
+app.MapPost("/login", async (LoginViewModel model, SignInManager<IdentityUser> signInManager) =>
+{
+    if (!string.IsNullOrEmpty(model.Email) && !string.IsNullOrEmpty(model.Password))
+    {
+        var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+        if (result.Succeeded)
+        {
+            return Results.Ok();
+        }
+        return Results.BadRequest("Invalid login attempt.");
+    }
+    return Results.BadRequest("Invalid login details");
+});
+
+// Вихід
+app.MapPost("/logout", async (SignInManager<IdentityUser> signInManager) =>
+{
+    await signInManager.SignOutAsync();
+    return Results.Ok();
+});
+
+//читання статей
 app.MapGet(pattern: "/articles", async(ArticlesContext context) => await context.Articles.ToListAsync());
 
-//РґРѕРґР°РІР°РЅРЅСЏ СЃС‚Р°С‚С‚С–
+//додавання статті
 app.MapPost(pattern: "articles", async (Article article, ArticlesContext context) =>
 {
     context.Articles.Add(article); ;
     await context.SaveChangesAsync();
     return Results.Created(uri: $"/articles/{article.Id}", article);
 }
-);
+).RequireAuthorization();
 
-//РїРѕС€СѓРє Р·Р° РЅР°Р·РІРѕСЋ
+//пошук за назвою
 app.MapGet(pattern: "/articles/title/{Title}", async (string Title, ArticlesContext context) =>
 {
     var articles = await context.Articles.Where(a => a.Title == Title).ToListAsync();
@@ -61,7 +113,7 @@ app.MapGet(pattern: "/articles/title/{Title}", async (string Title, ArticlesCont
     return Results.Ok(articles);
 });
 
-//РїРѕС€СѓРє Р·Р° РєР°С‚РµРіРѕСЂС–С”СЋ
+//пошук за категорією
 app.MapGet(pattern: "/articles/category/{Category}", async (string Category, ArticlesContext context) =>
 {
     var articles = await context.Articles.Where(a => a.Category == Category).ToListAsync();
@@ -73,7 +125,7 @@ app.MapGet(pattern: "/articles/category/{Category}", async (string Category, Art
     return Results.Ok(articles);
 });
 
-//РїРѕС€СѓРє Р·Р° РѕРїРёСЃРѕРј
+//пошук за описом
 app.MapGet(pattern: "/articles/description/{Description}", async (string Description, ArticlesContext context) =>
 {
     var articles = await context.Articles.Where(a => a.Description == Description).ToListAsync();
@@ -83,18 +135,6 @@ app.MapGet(pattern: "/articles/description/{Description}", async (string Descrip
     }
 
     return Results.Ok(articles);
-});
-
-//РїРѕС€СѓРє Р·Р° ID
-app.MapGet("/articles/{id:int}", async (int id, ArticlesContext context) =>
-{
-    var article = await context.Articles.FindAsync(id);
-    if (article == null)
-    {
-        return Results.NotFound();
-    }
-
-    return Results.Ok(article);
 });
 
 app.MapDelete(pattern: "/articles/{id:int}", async (int id, ArticlesContext context) =>
@@ -109,9 +149,9 @@ app.MapDelete(pattern: "/articles/{id:int}", async (int id, ArticlesContext cont
     await context.SaveChangesAsync();
 
     return Results.NoContent();
-});
+}).RequireAuthorization();
 
-// СЂРµРґР°РіСѓРІР°РЅРЅСЏ СЃС‚Р°С‚С‚С–
+// редагування статті
 app.MapPut("/articles/{id:int}", async (int id, Article updatedArticle, ArticlesContext context) =>
 {
     if (id != updatedArticle.Id)
@@ -125,7 +165,7 @@ app.MapPut("/articles/{id:int}", async (int id, Article updatedArticle, Articles
         return Results.NotFound();
     }
 
-    // РћРЅРѕРІР»РµРЅРЅСЏ РїРѕР»С–РІ СЃС‚Р°С‚С‚С–
+    // Оновлення полів статті
     article.Title = updatedArticle.Title;
     article.Author = updatedArticle.Author;
     article.Category = updatedArticle.Category;
@@ -150,10 +190,8 @@ app.MapPut("/articles/{id:int}", async (int id, Article updatedArticle, Articles
     }
 
     return Results.NoContent();
-});
+}).RequireAuthorization(); 
 
-
-//app.UseAuthorization();
 
 app.MapControllers();
 
