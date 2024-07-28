@@ -137,6 +137,40 @@ app.MapGet(pattern: "/articles/description/{Description}", async (string Descrip
     return Results.Ok(articles);
 });
 
+//пошук за Id
+app.MapGet(pattern: "/articles/id/{Id}", async (int Id, ArticlesContext context) =>
+{
+    var articles = await context.Articles.Where(a => a.Id == Id).ToListAsync();
+    if (articles == null || !articles.Any())
+    {
+        return Results.NotFound();
+    }
+
+    return Results.Ok(articles);
+});
+
+// Обробка запитів пошуку за частковим співпадінням
+app.MapGet("/articles/search", async (string query, ArticlesContext context) =>
+{
+    if (string.IsNullOrWhiteSpace(query))
+    {
+        return Results.BadRequest("Query parameter is missing.");
+    }
+
+    var articles = await context.Articles
+        .Where(a => EF.Functions.ILike(a.Title, $"%{query}%")
+                    || EF.Functions.ILike(a.Description, $"%{query}%")
+                    || EF.Functions.ILike(a.Category, $"%{query}%"))
+        .ToListAsync();
+
+    if (articles == null || !articles.Any())
+    {
+        return Results.NotFound();
+    }
+
+    return Results.Ok(articles);
+});
+
 app.MapDelete(pattern: "/articles/{id:int}", async (int id, ArticlesContext context) =>
 {
     var article = await context.Articles.FindAsync(id);
