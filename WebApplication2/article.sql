@@ -1,54 +1,36 @@
---
--- PostgreSQL database dump
---
+-- Table: article.articles
 
--- Dumped from database version 16.3
--- Dumped by pg_dump version 16.3
+-- DROP TABLE IF EXISTS article.articles;
+-- SEQUENCE: article.articles_id_seq
 
--- Started on 2024-07-26 15:17:28
+-- DROP SEQUENCE IF EXISTS article.articles_id_seq;
 
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
+CREATE SEQUENCE IF NOT EXISTS article.articles_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 2147483647
+    CACHE 1;
 
---
--- TOC entry 4813 (class 0 OID 16418)
--- Dependencies: 219
--- Data for Name: articles; Type: TABLE DATA; Schema: article; Owner: postgres
---
+ALTER SEQUENCE article.articles_id_seq
+    OWNED BY article.articles.id;
 
-INSERT INTO article.articles (id, title, author, category, description, filename, date) VALUES (2, 'Безпека та надійність систем штучного інтелекту: методи оцінки та вдосконалення', 'Марина Нейронова', 'Кібербезпека та криптографія', 'У сучасному світі, де штучний інтелект (ШІ) відіграє ключову роль у різноманітних галузях, питання безпеки та надійності цих систем стає все більш актуальним. Ця стаття присвячена аналізу сучасних методів оцінки та вдосконалення безпеки ШІ, а також розгляду викликів, з якими стикаються дослідники та розробники. З розвитком технологій ШІ стає важливим забезпечення захисту від потенційних загроз і вразливостей, які можуть мати критичний вплив на функціонування цих систем. Ми розглянемо новітні підходи до зміцнення надійності ШІ, а також представимо рекомендації для майбутніх досліджень у цій сфері.', NULL, '2023-02-22');
-INSERT INTO article.articles (id, title, author, category, description, filename, date) VALUES (3, 'Розробка ефективних алгоритмів глибинного навчання для обробки природної мови', 'Ольга Алгоритмова', 'Штучний інтелект та машинне навчання', 'У сучасну епоху інформації обробка природної мови (NLP) є однією з найважливіших і найскладніших задач штучного інтелекту. Ця стаття присвячена розробці ефективних алгоритмів глибинного навчання, які здатні значно покращити точність та продуктивність NLP систем. Ми розглянемо новітні методи і архітектури нейронних мереж, що дозволяють більш ефективно аналізувати, розуміти та генерувати природну мову. Особливу увагу буде приділено практичним аспектам впровадження цих алгоритмів у різні додатки, включаючи машинний переклад, розпізнавання мовлення та чат-боти.', NULL, '2023-02-23');
-INSERT INTO article.articles (id, title, author, category, description, filename, date) VALUES (4, 'Використання наноматеріалів у створенні високоефективних комп''ютерних чіпів', 'Сергій Кібернетик', 'Нанотехнології та квантові обчислення', 'З розвитком технологій, наноматеріали стали ключовим елементом у створенні високоефективних комп''ютерних чіпів. Ця стаття розглядає останні досягнення в області нанотехнологій, що дозволяють значно підвищити продуктивність та зменшити енергоспоживання комп''ютерних систем. Ми проаналізуємо різноманітні підходи до інтеграції наноматеріалів у сучасні напівпровідникові технології, а також їх вплив на розвиток обчислювальної техніки. Особливу увагу буде приділено викликам і перспективам використання наноматеріалів у створенні майбутніх поколінь комп''ютерних чіпів.', NULL, '2023-02-24');
-INSERT INTO article.articles (id, title, author, category, description, filename, date) VALUES (7, 'Генеративні змагальні мережі (GANs): нові підходи до синтезу реалістичних зображень', 'Олександр Кодер', 'Штучний інтелект та машинне навчання', 'Генеративні змагальні мережі (GANs) стали однією з найзахоплюючих інновацій у сфері штучного інтелекту та машинного навчання, відкриваючи нові горизонти у синтезі реалістичних зображень. Ця стаття присвячена сучасним методам та підходам до розробки та вдосконалення GANs, що дозволяють створювати зображення з неперевершеною реалістичністю. Ми розглянемо різноманітні архітектури GANs, такі як StyleGAN та BigGAN, а також новітні техніки для підвищення стабільності та якості генеративних моделей. Крім того, обговоримо застосування GANs у різних галузях, включаючи мистецтво, дизайн, медицину та розваги, і розглянемо майбутні перспективи та виклики, що стоять перед цією захоплюючою технологією.', NULL, '2023-02-25');
-INSERT INTO article.articles (id, title, author, category, description, filename, date) VALUES (8, 'Етика та відповідальність у розробці штучного інтелекту: аналіз і рекомендації', 'Наталія Бітова', 'Етика та соціальні аспекти технологій', 'Розвиток штучного інтелекту (ШІ) відкриває нові горизонти можливостей, але водночас ставить перед суспільством важливі етичні питання. Ця стаття присвячена аналізу етичних та відповідальних підходів до розробки ШІ, розглядаючи, як забезпечити справедливість, прозорість та безпеку в процесі створення інтелектуальних систем. Ми дослідимо основні етичні дилеми, пов''язані з автоматизацією рішень, конфіденційністю даних, і впливом ШІ на ринок праці та соціальні структури. Особливу увагу буде приділено розробці рекомендацій для розробників і політиків, спрямованих на мінімізацію негативних наслідків та максимізацію позитивного впливу ШІ на суспільство. Цей аналіз допоможе краще зрозуміти, як інтегрувати етичні принципи у всі етапи розробки ШІ, забезпечуючи відповідальне використання цієї потужної технології.', NULL, '2023-02-26');
-INSERT INTO article.articles (id, title, author, category, description, filename, date) VALUES (9, 'Психологічні аспекти взаємодії з VR/AR технологіями: нові знахідки', 'Дар''я Технологічна', 'Віртуальна та доповнена реальність (VR/AR)', 'З розвитком технологій віртуальної та доповненої реальності (VR/AR) виникає все більше питань щодо їхнього впливу на психологічний стан користувачів. Ця стаття досліджує новітні знахідки в області психологічних аспектів взаємодії з VR/AR технологіями, розкриваючи, як ці інновації впливають на сприйняття, емоції та поведінку людей. Ми розглянемо різноманітні експериментальні дослідження, що вивчають вплив VR/AR на когнітивні процеси, рівень стресу, емпатію та соціальну взаємодію. Особливу увагу буде приділено потенційним ризикам та перевагам використання VR/AR в різних контекстах, таких як освіта, медицина та розваги, а також перспективам майбутніх досліджень у цій динамічній сфері.', NULL, '2023-02-27');
-INSERT INTO article.articles (id, title, author, category, description, filename, date) VALUES (16, '1111string', 'string', 'string', 'string', 'string', '2024-07-25');
-INSERT INTO article.articles (id, title, author, category, description, filename, date) VALUES (17, 'string', 'string', 'string', 'string', 'string', '2024-07-25');
-INSERT INTO article.articles (id, title, author, category, description, filename, date) VALUES (18, 'string', 'string', 'string', 'string', 'string', '2024-07-25');
-INSERT INTO article.articles (id, title, author, category, description, filename, date) VALUES (19, 'string', 'string', 'string', 'string', 'string', '2024-07-25');
-INSERT INTO article.articles (id, title, author, category, description, filename, date) VALUES (20, '111string', '1111string', 'string', 'string', 'string', '2024-07-26');
+ALTER SEQUENCE article.articles_id_seq
+    OWNER TO postgres;
 
+CREATE TABLE IF NOT EXISTS article.articles
+(
+    id integer NOT NULL DEFAULT nextval('article.articles_id_seq'::regclass),
+    title character varying(120) COLLATE pg_catalog."default" NOT NULL,
+    author character varying(50) COLLATE pg_catalog."default",
+    category character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    description text COLLATE pg_catalog."default",
+    filename character varying(200) COLLATE pg_catalog."default",
+    date date,
+    CONSTRAINT articles_pkey PRIMARY KEY (id)
+)
 
---
--- TOC entry 4820 (class 0 OID 0)
--- Dependencies: 218
--- Name: articles_id_seq; Type: SEQUENCE SET; Schema: article; Owner: postgres
---
+TABLESPACE pg_default;
 
-SELECT pg_catalog.setval('article.articles_id_seq', 21, true);
-
-
--- Completed on 2024-07-26 15:17:28
-
---
--- PostgreSQL database dump complete
---
-
+ALTER TABLE IF EXISTS article.articles
+    OWNER to postgres;
